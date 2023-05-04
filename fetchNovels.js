@@ -8,12 +8,16 @@ const fetchNovels = async () => {
   const NOVELS_FOLDER = "data/novels";
   const fileExists = existsSync(INFO_FILE_PATH);
   const foldreExists = existsSync(NOVELS_FOLDER);
+  const dataFolderExists = existsSync("data");
+  if (!dataFolderExists) {
+    mkdirSync("data");
+  }
   if (!fileExists) return;
   if (!foldreExists) {
     mkdirSync(NOVELS_FOLDER);
   }
 
-  const novelsData = JSON.parse(readFileSync(INFO_FILE_PATH, "utf8")).flat() ;
+  const novelsData = JSON.parse(readFileSync(INFO_FILE_PATH, "utf8")).flat();
 
   let shouldRefetch = true;
   const askQuestion = () => {
@@ -44,24 +48,26 @@ const fetchNovels = async () => {
       await Promise.all(
         novelsChunk.map(async (novel) => {
           const { title, formats: novelformats } = novel;
-          
+
           const formats = [
-            "text/plain; charset=utf-8", 
-            "text/plain; charset=us-ascii", 
-            "text/plain; charset=iso-8859-1", 
-            "text/plain"
-          ]
+            "text/plain; charset=utf-8",
+            "text/plain; charset=us-ascii",
+            "text/plain; charset=iso-8859-1",
+            "text/plain",
+          ];
           process.stdout.write(`\r fetching ${title} in progress...`);
-          
-          for(let format of formats){
-            const textFile = novelformats[format]
-            if(!textFile) continue;
+
+          for (let format of formats) {
+            const textFile = novelformats[format];
+            if (!textFile) continue;
             try {
               const text = (await axios(textFile)).data;
               writeFileSync(join(NOVELS_FOLDER, `${title}.txt`), text, "utf-8");
               break;
             } catch (error) {
-              console.log(`couldn't fetch the text file for ${title} with format ${format}`);
+              console.log(
+                `couldn't fetch the text file for ${title} with format ${format}`
+              );
             }
           }
         })
