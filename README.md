@@ -1,5 +1,5 @@
 # Gutendex Book Downloader
-Description
+## Description
 This app downloads novels from the Gutendex API and stores them in a local data folder. The data collected by this app can be used for machine learning applications, such as text analysis and natural language processing.
 
 # Installation
